@@ -1,0 +1,36 @@
+# Simplified Requirements for Plant Disease Detection System
+
+# Core ML and Image Processing
+tensorflow
+numpy
+Pillow
+
+# Streamlit
+streamlit>=1.40.0
+
+# Backend API
+fastapi
+uvicorn
+python-multipart
+
+# Data Analysis and Visualization
+pandas>=2.0.0
+plotly
+
+# Google Generative AI (Gemini)
+google-generativeai
+
+# Text-to-Speech
+gtts
+pyttsx3
+
+# Translation
+deep-translator
+
+# Audio playback
+pygame
+
+# Database (built into Python)
+# sqlite3 - no installation needed
+
+# Additional utilities

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeafSense-AI — Plant Disease Detection</title>
+    <meta name="description" content="LeafSense-AI — AI-powered plant disease detection with farming guides and crop library.">
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- ========== AUTH SCREEN ========== -->
+<div id="auth-screen" class="auth-screen active">
+    <div class="auth-bg-blob blob1"></div>
+    <div class="auth-bg-blob blob2"></div>
+    <div class="auth-bg-blob blob3"></div>
+
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="logo-icon"><i class="fa-solid fa-leaf"></i></div>
+            <h1>LeafSense-AI</h1>
+            <p class="auth-tagline">AI-Powered Plant Disease Detection</p>
+        </div>
+
+        <div class="tab-switcher">
+            <button id="tab-login-btn" class="tab-sw-btn active" onclick="switchAuthTab('login')">Sign In</button>
+            <button id="tab-reg-btn" class="tab-sw-btn" onclick="switchAuthTab('register')">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+            <div class="input-group">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-primary" id="login-btn">
+                <span>Sign In</span><i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <p class="form-error" id="login-error"></p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+            <div class="input-group">
+                <i class="fa-solid fa-id-card"></i>
+                <input type="text" id="reg-fullname" placeholder="Full Name" required>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="reg-email" placeholder="Email Address" required>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="reg-username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="reg-password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn-primary" id="register-btn">
+                <span>Create Account</span><i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <p class="form-error" id="reg-error"></p>
+        </form>
+    </div>
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<div id="app-screen" class="app-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon-sm"><i class="fa-solid fa-leaf"></i></div>
+            <span>LeafSense-AI</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a class="nav-item active" data-page="detect" onclick="navigate('detect')">
+                <i class="fa-solid fa-microscope"></i>
+                <span>Disease Detection</span>
+            </a>
+            <a class="nav-item" data-page="weather" onclick="navigate('weather')">
+                <i class="fa-solid fa-cloud-sun-rain"></i>
+                <span>Weather Guide</span>
+            </a>
+            <a class="nav-item" data-page="season" onclick="navigate('season')">
+                <i class="fa-solid fa-calendar-alt"></i>
+                <span>Seasonal Guide</span>
+            </a>
+            <a class="nav-item" data-page="tips" onclick="navigate('tips')">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Farming Tips</span>
+            </a>
+            <a class="nav-item" data-page="crop" onclick="navigate('crop')">
+                <i class="fa-solid fa-seedling"></i>
+                <span>Crop Library</span>
+            </a>
+            <a class="nav-item" data-page="chat" onclick="navigate('chat')">
+                <i class="fa-solid fa-comments"></i>
+                <span>AI Assistant</span>
+            </a>
+            <a class="nav-item" data-page="history" onclick="navigate('history')">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+            <div class="user-meta">
+                <span class="user-name" id="sidebar-username">User</span>
+                <span class="user-role" id="sidebar-role">Member</span>
+            </div>
+            <button onclick="logout()" class="logout-btn" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+            <h2 class="page-title" id="page-title">Disease Detection</h2>
+            <div class="topbar-right">
+                <span class="welcome-badge">Welcome, <strong id="topbar-name">User</strong></span>
+            </div>
+        </div>
+
+        <!-- ===== PAGE: DISEASE DETECTION ===== -->
+        <section id="page-detect" class="page active">
+            <div class="detect-grid">
+                <!-- Upload Panel -->
+                <div class="card upload-card">
+                    <h3 class="card-title"><i class="fa-solid fa-upload"></i> Upload Plant Image</h3>
+                    <div id="drop-zone" class="drop-zone" onclick="document.getElementById('file-input').click()">
+                        <div class="drop-icon"><i class="fa-solid fa-image"></i></div>
+                        <p>Drag & drop a leaf image here</p>
+                        <span>or click to browse</span>
+                        <input type="file" id="file-input" accept="image/*" hidden onchange="handleFileSelect(this)">
+                    </div>
+                    <div id="preview-wrap" class="preview-wrap hidden">
+                        <img id="img-preview" src="" alt="Preview">
+                        <div class="preview-actions">
+                            <button class="btn-outline" onclick="resetUpload()"><i class="fa-solid fa-rotate-left"></i> Change</button>
+                            <button class="btn-primary" id="analyze-btn" onclick="analyzeImage()">
+                                <i class="fa-solid fa-magnifying-glass-chart"></i> Analyze
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Panel -->
+                <div class="card result-card" id="result-card">
+                    <div id="result-placeholder" class="result-placeholder">
+                        <i class="fa-solid fa-leaf fa-3x"></i>
+                        <p>Upload a plant image and click Analyze to get started</p>
+                    </div>
+                    <div id="result-content" class="hidden">
+                        <h3 class="card-title"><i class="fa-solid fa-circle-check"></i> Analysis Result</h3>
+                        <div class="disease-badge" id="disease-badge"></div>
+                        <div class="confidence-section">
+                            <div class="conf-label">
+                                <span>Confidence</span>
+                                <span id="conf-pct"></span>
+                            </div>
+                            <div class="conf-bar"><div class="conf-fill" id="conf-fill"></div></div>
+                        </div>
+                        <button class="btn-outline full-width" id="info-btn" onclick="loadDiseaseInfo()">
+                            <i class="fa-solid fa-circle-info"></i> Get Disease Info
+                        </button>
+                        <div id="disease-info-box" class="info-box hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat below detect -->
+            <div class="card chat-inline-card" id="chat-inline" style="display:none">
+                <div class="chat-header">
+                    <h3 class="card-title"><i class="fa-solid fa-robot"></i> Ask AI About This Disease</h3>
+                    <div class="lang-select">
+                        <select id="detect-lang" class="select-sm">
+                            <option value="en">English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option>
+                            <option value="ta">Tamil</option>
+                            <option value="te">Telugu</option>
+                            <option value="mr">Marathi</option>
+                            <option value="gu">Gujarati</option>
+                            <option value="kn">Kannada</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="pa">Punjabi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chat-messages" id="inline-chat-messages"></div>
+                <div class="chat-input-row">
+                    <input type="text" id="inline-chat-input" placeholder="Ask about this disease..." onkeydown="if(event.key==='Enter') sendInlineChat()">
+                    <button class="btn-primary icon-btn" onclick="sendInlineChat()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PAGE: WEATHER GUIDE ===== -->
+        <section id="page-weather" class="page">
+            <div class="guide-layout">
+                <div class="card guide-control-card">
+                    <h3 class="card-title"><i class="fa-solid fa-cloud-sun-rain"></i> Weather Farming Guide</h3>
+                    <p class="card-desc">Get AI-powered farming advice tailored to your current weather conditions.</p>
+                    <div class="form-field">
+                        <label>Weather Condition</label>
+                        <div class="option-grid" id="weather-options">
+                            <button class="option-btn active" data-val="Hot and Dry" onclick="selectOption(this, 'weather-options')">☀️ Hot & Dry</button>
+                            <button class="option-btn" data-val="Humid" onclick="selectOption(this, 'weather-options')">💧 Humid</button>
+                            <button class="option-btn" data-val="Rainy/Monsoon" onclick="selectOption(this, 'weather-options')">🌧️ Rainy/Monsoon</button>
+                            <button class="option-btn" data-val="Cold/Winter" onclick="selectOption(this, 'weather-options')">❄️ Cold/Winter</button>
+                            <button class="option-btn" data-val="Moderate" onclick="selectOption(this, 'weather-options')">🌤️ Moderate</button>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Language</label>
+                        <select class="select-field" id="weather-lang">
+                            <option value="en">English</option><option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option><option value="ta">Tamil</option>
+                            <option value="te">Telugu</option><option value="mr">Marathi</option>
+                            <option value="gu">Gujarati</option><option value="kn">Kannada</option>
+                            <option value="ml">Malayalam</option><option value="pa">Punjabi</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary full-width" onclick="fetchGuidance('weather', 'weather-options', 'weather-lang', 'weather-result')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Get Weather Guide
+                    </button>
+
+                    <div class="quick-tips">
+                        <h4>Quick Tips</h4>
+                        <ul id="weather-quick-tips">
+                            <li><i class="fa-solid fa-droplet"></i> Water early morning to reduce evaporation</li>
+                            <li><i class="fa-solid fa-layer-group"></i> Use mulch to retain soil moisture</li>
+                            <li><i class="fa-solid fa-wind"></i> Ensure good air circulation between plants</li>
+                            <li><i class="fa-solid fa-temperature-high"></i> Shade sensitive crops during peak heat</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card guide-result-card">
+                    <div class="result-empty" id="weather-result-empty">
+                        <i class="fa-solid fa-cloud-sun fa-3x"></i>
+                        <p>Select a weather condition and click Get Guide</p>
+                    </div>
+                    <div id="weather-result" class="guide-result hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PAGE: SEASONAL GUIDE ===== -->
+        <section id="page-season" class="page">
+            <div class="guide-layout">
+                <div class="card guide-control-card">
+                    <h3 class="card-title"><i class="fa-solid fa-calendar-alt"></i> Seasonal Farming Guide</h3>
+                    <p class="card-desc">Plan your farming activities based on the current season.</p>
+                    <div class="form-field">
+                        <label>Select Season</label>
+                        <div class="option-grid" id="season-options">
+                            <button class="option-btn active" data-val="Spring (March-May)" onclick="selectOption(this, 'season-options')">🌸 Spring</button>
+                            <button class="option-btn" data-val="Summer (June-August)" onclick="selectOption(this, 'season-options')">☀️ Summer</button>
+                            <button class="option-btn" data-val="Monsoon (September-November)" onclick="selectOption(this, 'season-options')">🌧️ Monsoon</button>
+                            <button class="option-btn" data-val="Winter (December-February)" onclick="selectOption(this, 'season-options')">❄️ Winter</button>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Language</label>
+                        <select class="select-field" id="season-lang">
+                            <option value="en">English</option><option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option><option value="ta">Tamil</option>
+                            <option value="te">Telugu</option><option value="mr">Marathi</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary full-width" onclick="fetchGuidance('season', 'season-options', 'season-lang', 'season-result')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Get Seasonal Guide
+                    </button>
+
+                    <div class="crop-calendar">
+                        <h4>Crop Calendar</h4>
+                        <div class="calendar-grid" id="crop-calendar-grid">
+                            <div class="cal-col"><strong>🌱 Sow</strong><span>Tomato</span><span>Pepper</span><span>Corn</span></div>
+                            <div class="cal-col"><strong>🌾 Harvest</strong><span>Wheat</span><span>Mustard</span><span>Peas</span></div>
+                            <div class="cal-col"><strong>💧 Care</strong><span>Regular watering</span><span>Fertilize</span><span>Pest control</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card guide-result-card">
+                    <div class="result-empty" id="season-result-empty">
+                        <i class="fa-solid fa-seedling fa-3x"></i>
+                        <p>Select a season and click Get Guide</p>
+                    </div>
+                    <div id="season-result" class="guide-result hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PAGE: FARMING TIPS ===== -->
+        <section id="page-tips" class="page">
+            <div class="guide-layout">
+                <div class="card guide-control-card">
+                    <h3 class="card-title"><i class="fa-solid fa-lightbulb"></i> Farming Tips & Best Practices</h3>
+                    <p class="card-desc">Get expert agricultural tips powered by AI.</p>
+                    <div class="form-field">
+                        <label>Select Topic</label>
+                        <div class="option-grid" id="tips-options">
+                            <button class="option-btn active" data-val="General Tips" onclick="selectOption(this, 'tips-options')">🌿 General</button>
+                            <button class="option-btn" data-val="Organic Farming" onclick="selectOption(this, 'tips-options')">🌱 Organic</button>
+                            <button class="option-btn" data-val="Water Management" onclick="selectOption(this, 'tips-options')">💧 Water</button>
+                            <button class="option-btn" data-val="Soil Health" onclick="selectOption(this, 'tips-options')">🪱 Soil</button>
+                            <button class="option-btn" data-val="Pest Control" onclick="selectOption(this, 'tips-options')">🐛 Pests</button>
+                            <button class="option-btn" data-val="Crop Rotation" onclick="selectOption(this, 'tips-options')">🔄 Rotation</button>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Language</label>
+                        <select class="select-field" id="tips-lang">
+                            <option value="en">English</option><option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option><option value="ta">Tamil</option>
+                            <option value="te">Telugu</option><option value="mr">Marathi</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary full-width" onclick="fetchGuidance('tips', 'tips-options', 'tips-lang', 'tips-result')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Get Tips
+                    </button>
+                    <div class="featured-tips">
+                        <h4>⭐ Featured Tips</h4>
+                        <div class="tip-item"><b>1.</b> Rotate crops yearly to prevent soil depletion</div>
+                        <div class="tip-item"><b>2.</b> Test soil pH before planting for better yield</div>
+                        <div class="tip-item"><b>3.</b> Use companion planting to reduce pests naturally</div>
+                        <div class="tip-item"><b>4.</b> Mulch crops to retain moisture and control weeds</div>
+                        <div class="tip-item"><b>5.</b> Water deeply but less frequently for stronger roots</div>
+                    </div>
+                </div>
+                <div class="card guide-result-card">
+                    <div class="result-empty" id="tips-result-empty">
+                        <i class="fa-solid fa-lightbulb fa-3x"></i>
+                        <p>Select a topic and click Get Tips</p>
+                    </div>
+                    <div id="tips-result" class="guide-result hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PAGE: CROP LIBRARY ===== -->
+        <section id="page-crop" class="page">
+            <div class="guide-layout">
+                <div class="card guide-control-card">
+                    <h3 class="card-title"><i class="fa-solid fa-seedling"></i> Crop Information Library</h3>
+                    <p class="card-desc">Get detailed cultivation guides for any crop.</p>
+                    <div class="form-field">
+                        <label>Popular Crops</label>
+                        <div class="crop-chips" id="crop-options">
+                            <button class="crop-chip active" data-val="Tomato" onclick="selectCrop(this)">🍅 Tomato</button>
+                            <button class="crop-chip" data-val="Potato" onclick="selectCrop(this)">🥔 Potato</button>
+                            <button class="crop-chip" data-val="Rice" onclick="selectCrop(this)">🌾 Rice</button>
+                            <button class="crop-chip" data-val="Wheat" onclick="selectCrop(this)">🌿 Wheat</button>
+                            <button class="crop-chip" data-val="Corn" onclick="selectCrop(this)">🌽 Corn</button>
+                            <button class="crop-chip" data-val="Apple" onclick="selectCrop(this)">🍎 Apple</button>
+                            <button class="crop-chip" data-val="Grape" onclick="selectCrop(this)">🍇 Grape</button>
+                            <button class="crop-chip" data-val="Pepper" onclick="selectCrop(this)">🫑 Pepper</button>
+                            <button class="crop-chip" data-val="Strawberry" onclick="selectCrop(this)">🍓 Strawberry</button>
+                            <button class="crop-chip" data-val="Mango" onclick="selectCrop(this)">🥭 Mango</button>
+                            <button class="crop-chip" data-val="Onion" onclick="selectCrop(this)">🧅 Onion</button>
+                            <button class="crop-chip" data-val="Garlic" onclick="selectCrop(this)">🧄 Garlic</button>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Language</label>
+                        <select class="select-field" id="crop-lang">
+                            <option value="en">English</option><option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option><option value="ta">Tamil</option>
+                            <option value="te">Telugu</option><option value="mr">Marathi</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary full-width" onclick="fetchCropInfo()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Get Crop Guide
+                    </button>
+                </div>
+                <div class="card guide-result-card">
+                    <div class="result-empty" id="crop-result-empty">
+                        <i class="fa-solid fa-seedling fa-3x"></i>
+                        <p>Select a crop and click Get Crop Guide</p>
+                    </div>
+                    <div id="crop-result" class="guide-result hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PAGE: AI ASSISTANT ===== -->
+        <section id="page-chat" class="page">
+            <div class="card chat-card">
+                <div class="chat-topbar">
+                    <div class="chat-meta">
+                        <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
+                        <div>
+                            <h3>LeafSense-AI</h3>
+                            <span class="online-dot"></span><small>Online — Ask me anything about farming</small>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:center">
+                        <select id="chat-lang" class="select-sm">
+                            <option value="en">English</option><option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option><option value="ta">Tamil</option>
+                            <option value="te">Telugu</option><option value="mr">Marathi</option>
+                            <option value="gu">Gujarati</option><option value="kn">Kannada</option>
+                        </select>
+                        <button class="btn-outline" onclick="clearChat()"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="chat-bubble bot">
+                        <div class="bubble-avatar"><i class="fa-solid fa-robot"></i></div>
+                        <div class="bubble-content">Hello! I'm LeafSense-AI. Ask me anything about plant diseases, farming practices, crop care, or agricultural advice. I can respond in multiple languages!</div>
+                    </div>
+                </div>
+                <div class="suggestions-row" id="chat-suggestions">
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">What causes leaf yellowing?</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Best fertilizer for tomatoes?</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">How to prevent fungal disease?</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Organic pest control methods?</button>
+                </div>
+                <div class="chat-input-bar">
+                    <input type="text" id="chat-input" placeholder="Type your question here..." onkeydown="if(event.key==='Enter') sendChat()">
+                    <button class="btn-primary icon-btn" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PAGE: HISTORY ===== -->
+        <section id="page-history" class="page">
+            <div class="card history-card">
+                <div class="history-header">
+                    <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Detection History</h3>
+                    <button class="btn-outline" onclick="loadHistory()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                </div>
+                <div id="history-empty" class="result-empty">
+                    <i class="fa-solid fa-inbox fa-3x"></i>
+                    <p>No detections yet. Upload a plant image to get started!</p>
+                </div>
+                <div id="history-list" class="history-list hidden"></div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loader-card">
+        <div class="spinner"></div>
+        <p id="loading-text">Analyzing...</p>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
